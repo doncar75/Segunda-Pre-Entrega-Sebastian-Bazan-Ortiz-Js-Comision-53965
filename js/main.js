@@ -1,5 +1,8 @@
-let nombre = prompt("¡Bienvenido a Doncar Burger! Por favor, introduce tu nombre:");
-alert("Hola, " + nombre + ". ¡A continuación verás nuestro menú!");
+// Función de saludo de bienvenida
+function saludar() {
+    let nombre = prompt("¡Bienvenido a Doncar Burger! Por favor, introduce tu nombre:");
+    alert("Hola, " + nombre + ". ¡A continuación verás nuestro menú!");
+}
 
 const hamburguesasDisponibles = [
     { 
@@ -39,26 +42,45 @@ const hamburguesasDisponibles = [
         ]
     }
 ];
+// Función para mostrar opciones de hamburguesas
+function mostrarOpciones() {
+    const mensajeOpciones = "Estas son nuestras hamburguesas disponibles:\n\n" +
+        hamburguesasDisponibles.map((hamburguesa, index) => {
+            let mensaje = `${index + 1}. ${hamburguesa.nombre} - $${hamburguesa.precio}`;
+            if (hamburguesa.ingredientesExtra.length > 0) {
+                mensaje += "\n  Ingredientes extra disponibles:";
+                hamburguesa.ingredientesExtra.forEach((ingrediente) => {
+                    mensaje += `\n    - ${ingrediente.nombre} - $${ingrediente.precio}`;
+                });
+            }
+            return mensaje;
+        }).join('\n') +
+        "\n\nPor favor, introduce el número de la hamburguesa que deseas (1-4), 'b' para buscar por nombre, 'p' para buscar por precio máximo, 'i' para filtrar por ingrediente extra, o presiona 'x' para salir:";
+    
+    return prompt(mensajeOpciones);
+}
 
-// Generar mensaje de opciones utilizando map
-const mensajeOpciones = "Estas son nuestras hamburguesas disponibles:\n\n" +
-    hamburguesasDisponibles.map((hamburguesa, index) => {
-        let mensaje = `${index + 1}. ${hamburguesa.nombre} - $${hamburguesa.precio}`;
-        if (hamburguesa.ingredientesExtra.length > 0) {
-            mensaje += "\n  Ingredientes extra disponibles:";
-            hamburguesa.ingredientesExtra.forEach((ingrediente) => {
-                mensaje += `\n    - ${ingrediente.nombre} - $${ingrediente.precio}`;
-            });
-        }
-        return mensaje;
-    }).join('\n') +
-    "\n\nPor favor, introduce el número de la hamburguesa que deseas (1-4), o presiona 'x' para salir:";
+// Método de búsqueda por nombre de hamburguesa
+function buscarPorNombre(nombre) {
+    return hamburguesasDisponibles.find(hamburguesa => hamburguesa.nombre.toLowerCase() === nombre.toLowerCase());
+}
 
+// Método de búsqueda por precio máximo
+function buscarPorPrecioMaximo(precioMaximo) {
+    return hamburguesasDisponibles.filter(hamburguesa => hamburguesa.precio <= precioMaximo);
+}
+
+// Método de filtrado por ingredientes extras
+function filtrarPorIngredienteExtra(ingredienteExtra) {
+    return hamburguesasDisponibles.filter(hamburguesa => hamburguesa.ingredientesExtra.some(ingrediente => ingrediente.nombre.toLowerCase() === ingredienteExtra.toLowerCase()));
+}
+
+// Función principal para mostrar el menú y manejar las opciones
 function mostrarMenu() {
     let totalCompra = 0;
 
     do {
-        let opcionElegida = prompt(mensajeOpciones);
+        let opcionElegida = mostrarOpciones();
 
         switch (opcionElegida) {
             case "1":
@@ -83,6 +105,41 @@ function mostrarMenu() {
                     }
                 }
                 break;
+            case "b":
+                let nombreBuscar = prompt("Introduce el nombre de la hamburguesa que deseas buscar:");
+                let hamburguesaEncontrada = buscarPorNombre(nombreBuscar);
+                if (hamburguesaEncontrada) {
+                    alert(`Hemos encontrado la hamburguesa: ${hamburguesaEncontrada.nombre} - $${hamburguesaEncontrada.precio}`);
+                } else {
+                    alert("No se encontró ninguna hamburguesa con ese nombre.");
+                }
+                break;
+            case "p":
+                let precioMaximo = parseFloat(prompt("Introduce el precio máximo que deseas pagar:"));
+                let hamburguesasPrecioMaximo = buscarPorPrecioMaximo(precioMaximo);
+                if (hamburguesasPrecioMaximo.length > 0) {
+                    let mensaje = "Hamburguesas disponibles dentro del precio máximo:\n\n";
+                    hamburguesasPrecioMaximo.forEach(hamburguesa => {
+                        mensaje += `${hamburguesa.nombre} - $${hamburguesa.precio}\n`;
+                    });
+                    alert(mensaje);
+                } else {
+                    alert("No hay hamburguesas disponibles dentro del precio máximo especificado.");
+                }
+                break;
+            case "i":
+                let ingredienteExtra = prompt("Introduce el nombre del ingrediente extra para filtrar:");
+                let hamburguesasFiltradas = filtrarPorIngredienteExtra(ingredienteExtra);
+                if (hamburguesasFiltradas.length > 0) {
+                    let mensaje = `Hamburguesas que contienen ${ingredienteExtra} como ingrediente extra:\n\n`;
+                    hamburguesasFiltradas.forEach(hamburguesa => {
+                        mensaje += `${hamburguesa.nombre} - $${hamburguesa.precio}\n`;
+                    });
+                    alert(mensaje);
+                } else {
+                    alert(`No hay hamburguesas que contengan ${ingredienteExtra} como ingrediente extra.`);
+                }
+                break;
             case "x":
                 alert("Gracias por visitar Doncar Burger. ¡Que tengas un buen día!");
                 return;
@@ -102,5 +159,6 @@ function mostrarMenu() {
     }
 }
 
+// Llamada a las funciones para comenzar la aplicación
+saludar();
 mostrarMenu();
-
